@@ -10,7 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_05_28_114513) do
+ActiveRecord::Schema.define(version: 2019_06_04_183259) do
+
+  create_table "ip_lists", force: :cascade do |t|
+    t.string "ip"
+    t.boolean "permission"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "tasks", force: :cascade do |t|
     t.string "name"
