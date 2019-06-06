@@ -10,13 +10,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_06_04_183259) do
+ActiveRecord::Schema.define(version: 2019_06_06_121236) do
 
   create_table "ip_lists", force: :cascade do |t|
     t.string "ip"
-    t.boolean "permission"
+    t.boolean "state"
+    t.time "start_time"
+    t.time "end_time"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["ip"], name: "index_ip_uniqueness", unique: true
   end
 
   create_table "tasks", force: :cascade do |t|

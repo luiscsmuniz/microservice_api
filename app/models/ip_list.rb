@@ -1,0 +1,2 @@
+class IpList < ApplicationRecord
+end
