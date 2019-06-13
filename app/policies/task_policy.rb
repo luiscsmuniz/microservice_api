@@ -5,9 +5,13 @@ class TaskPolicy < ApplicationPolicy
     @user = user
     @permission = self.set_permission(permission, system, resource)
   end
-  
+
   def show?
     @permission[0][:resource][:actions].include?('show') && @user
+  end
+
+  def show?
+    @permission[0][:resource][:actions].include?('create') && @user
   end
  
 end

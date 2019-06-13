@@ -7,9 +7,8 @@ class TasksController < ApplicationController
   end
 
   def token
-    puts @teste
     begin
-      @decoded_token = self.decoded_token_test
+      @decoded_token = self.decoded_token.first
     rescue Exception => e
       render json: {
         errors: e
@@ -21,8 +20,8 @@ class TasksController < ApplicationController
   def index
     begin
       raise Pundit::NotAuthorizedError, 'Sem permissão para acessar esse recurso.' unless TaskPolicy.new(
-          @decoded_token[0]['data'][0]['email'], 
-          @decoded_token[0]['data'][0]['permission'],
+          @decoded_token['data']['email'], 
+          @decoded_token['data']['permission'],
           self.system,
           self.resource
         ).show?
@@ -30,8 +29,8 @@ class TasksController < ApplicationController
         @tasks = Task.all
         render json: { 
           tasks: @tasks, 
-          data: @decoded_token[0]['data'],
-          exp: @decoded_token[0]['exp'],
+          user: @decoded_token['data']['email'],
+          expire_in: Time.at(@decoded_token['exp']).strftime("%d/%m/%Y %H:%M")
         }
     rescue Exception => e
       render json: {
@@ -49,10 +48,19 @@ class TasksController < ApplicationController
   def create
     @task = Task.new(task_params)
 
-    if @task.save
-      render json: @task, status: :created, location: @task
-    else
-      render json: @task.errors, status: :unprocessable_entity
+    begin
+      raise Pundit::NotAuthorizedError, 'Sem permissão para acessar esse recurso.' unless TaskPolicy.new(
+          @decoded_token['data']['email'], 
+          @decoded_token['data']['permission'],
+          self.system,
+          self.resource
+        ).show?
+        @task.save
+        render json: @task, status: :created, location: @task
+    rescue Exception => e
+      render json: {
+        errors: e
+      }
     end
   end
 
@@ -78,6 +86,6 @@ class TasksController < ApplicationController
 
     # Only allow a trusted parameter "white list" through.
     def task_params
-      params.require(:task).permit(:name, :description)
+      params.permit(:name, :description)
     end
 end

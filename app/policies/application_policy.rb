@@ -13,7 +13,7 @@ class ApplicationPolicy
       end
       {
         system: per["system"],
-        resource: resource[0].deep_symbolize_keys
+        resource: resource.first.deep_symbolize_keys
       }
     end
   end
