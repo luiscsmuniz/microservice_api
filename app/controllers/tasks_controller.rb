@@ -54,7 +54,7 @@ class TasksController < ApplicationController
           @decoded_token['data']['permission'],
           self.system,
           self.resource
-        ).show?
+        ).create?
         @task.save
         render json: @task, status: :created, location: @task
     rescue Exception => e
