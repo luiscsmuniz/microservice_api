@@ -13,7 +13,7 @@ gem 'puma', '~> 3.11'
 
 gem 'jwt'
 gem 'rack-cors'
-
+gem 'pundit'
 gem 'rack-attack'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 # gem 'jbuilder', '~> 2.5'

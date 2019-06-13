@@ -1,21 +1,39 @@
 class TasksController < ApplicationController
   before_action :set_task, only: [:show, :update, :destroy]
+  before_action :token,
+
+  def resource
+    "tasks"
+  end
+
+  def token
+    puts @teste
+    begin
+      @decoded_token = self.decoded_token_test
+    rescue Exception => e
+      render json: {
+        errors: e
+      }
+    end
+  end
 
   # GET /tasks
   def index
-    secret = Digest::SHA256.hexdigest 'provider_app'
-
     begin
-      decoded_token = JWT.decode params[:token], secret, true, { algorithm: 'HS512' }
-      @tasks = Task.all
-      render json: { 
-        tasks: @tasks, 
-        user: decoded_token[0]['user'],
-        exp: decoded_token[0]['exp']
-      }
-
+      raise Pundit::NotAuthorizedError, 'Sem permissão para acessar esse recurso.' unless TaskPolicy.new(
+          @decoded_token[0]['data'][0]['email'], 
+          @decoded_token[0]['data'][0]['permission'],
+          self.system,
+          self.resource
+        ).show?
+        
+        @tasks = Task.all
+        render json: { 
+          tasks: @tasks, 
+          data: @decoded_token[0]['data'],
+          exp: @decoded_token[0]['exp'],
+        }
     rescue Exception => e
-      e.inspect
       render json: {
         errors: e
       }
